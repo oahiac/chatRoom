@@ -6,6 +6,8 @@ The program contains the server and the client.
 
 ## Server
 
+<img src="./pics/frame.png">
+
 The server is responsible for:
 1. Getting new connections
 2. Receving data from the clients

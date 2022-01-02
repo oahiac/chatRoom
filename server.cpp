@@ -20,7 +20,7 @@
 #define MAX_EVENT_NUMBER 1024
 #define USERNAME_SIZE 64
 
-
+pthread_mutex_t lock;
 
 struct fds {
   int epollfd;
@@ -91,6 +91,7 @@ void* recv_data(void* arg) {
   
   //printf("getting data from %d\n", connfd);
 
+  pthread_mutex_lock(&lock);
   memset(data[sockfd].read_buf, '\0', sizeof(data[sockfd].read_buf));
   while (1) {
     int ret = recv(sockfd, data[sockfd].read_buf, BUFFER_SIZE-1, 0);
@@ -129,6 +130,7 @@ void* recv_data(void* arg) {
       memset(buf, '\0', BUFFER_SIZE);
     }
   }
+  pthread_mutex_unlock(&lock);
 }
 
 void* send_data(void* arg) {
@@ -137,6 +139,7 @@ void* send_data(void* arg) {
 
   //printf("sending data '%s' to %d\n", data[connfd].write_buf, connfd);
 
+  pthread_mutex_lock(&lock);
   char send_tmp[BUFFER_SIZE];
   memset(send_tmp, '\0', BUFFER_SIZE);
   strcat(send_tmp, data[sockfd].write_buf);
@@ -145,6 +148,7 @@ void* send_data(void* arg) {
   assert(ret != -1);
   memset(data[sockfd].write_buf, '\0', BUFFER_SIZE);
   modfd(epollfd, sockfd, false);
+  pthread_mutex_unlock(&lock);
 }
 
 
